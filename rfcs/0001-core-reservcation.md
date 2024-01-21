@@ -136,8 +136,19 @@ CREATE TABLE rsvp.reservation (
 CREATE INDEX reservation_resource_id_idx ON rsvp.reservation(resource_id);
 CREATE INDEX reservation_user_id_idx ON rsvp.reservation(user_id);
 
-CREATE OR REPLACE FUNCTION rsvp.query(uid text, rid text, during:TSTZRANGE) RETURNS TABLE rsvp.reservation AS 
-$$ $$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION rsvp.query(uid text, rid text, during TSTZRANGE) RETURNS TABLE rsvp.reservation AS $$ 
+BEGIN
+    IF uid IS NULL AND rid IS NULL THEN
+        RETURN QUERY SELECT * FROM rsvp.reservation WHERE timespan && during;
+    ELSIF uid IS NULL THEN
+        RETURN QUERY SELECT * FROM rsvp.reservation WHERE resource_id = rid AND during @> timespan;
+    ELSIF rid IS NULL THEN 
+        RETURN QUERY SELECT * FROM rsvp.reservation WHERE uid = uid AND during @> timespan;
+    ELSE 
+        RETURN QUERY SELECT * FROM rsvp.reservation WHERE resource_id = rid AND user_id = uid AND during @> timespan;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TABLE rsvp.reservation_changes (
     id SERIAL NOT NULL,
