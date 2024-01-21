@@ -1,0 +1,98 @@
+syntax = "proto3";
+package reservation;
+
+import "google/protobuf/timestamp.proto";
+
+enum ReservationStatus {
+    RESERVATION_STATUS_UNKNOW = 0;
+    RESERVATION_STATUS_RENDING = 1;
+    RESERVATION_STATUS_CONFIGE = 2;
+    RESERVATION_STATUS_BLOCKED = 3;
+}
+
+enum ReservationUpdateType {
+    RESERVATION_UPDATE_TYPE_UNKNOW = 0;
+    RESERVATION_UPDATE_TYPE_CREATE = 1;
+    RESERVATION_UPDATE_TYPE_UPDATE = 2;
+    RESERVATION_UPDATE_TYPE_DELETE = 3;
+}
+
+message Reservation {
+    string id = 1;
+    string user_id = 2;
+    ReservationStatus status = 3;
+
+    string resource_id = 4;
+    google.protobuf.Timestamp  start_time = 5;
+    google.protobuf.Timestamp  end_time = 6;
+
+    string note = 7;
+}
+
+message  ReservateRequest {
+    Reservation reservation = 1;
+}
+
+message  ReservateResponse {
+    Reservation reservation = 1;
+}
+
+message  UpdateRequest {
+    string note = 1;
+}
+
+message  UpdateResponse {
+    Reservation reservation = 1;
+}
+
+message  ConfirmRequest {
+    string id = 1;
+}
+
+message  ConfirmResponse {
+    Reservation reservation = 1;
+}
+
+message  CancelRequest {
+    string id = 1;
+}
+
+message  CancelResponse {
+    Reservation id = 1;
+}
+
+message  GetRequest {
+    string id = 1;
+}
+
+message  GetResponse {
+    Reservation reservation = 1;
+}
+
+message  QueryRequest {
+    string resource_id = 1;
+    string user_id = 2;
+
+    ReservationStatus status = 3;
+    google.protobuf.Timestamp  start_time = 4;
+    google.protobuf.Timestamp  end_time = 5;
+}
+
+message  QueryResponse {
+    Reservation reservation = 1;
+    
+}
+
+message ListenResponse{
+    int32 op = 1;
+    Reservation reservation = 2;
+}
+
+service ReservationService {
+    rpc reservce(ReservateRequest) returns (ReservateResponse);  
+    rpc confirm(ConfirmRequest) returns (ConfirmResponse);  
+    rpc update(UpdateRequest) returns (UpdateResponse); 
+    rpc cancel(CancelRequest) returns (CancelResponse); 
+    rpc get(GetRequest) returns (GetResponse); 
+    rpc query(QueryRequest) returns ( stream Reservation );  
+}

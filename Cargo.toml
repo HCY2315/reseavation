@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "abi",
+    "reservation",
+    "service"
+]
+resolver = "2"
